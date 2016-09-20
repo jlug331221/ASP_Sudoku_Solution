@@ -1,0 +1,64 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Template for a SPARC file
+%% Author: Justin Lugo
+%% Description: Sudoku Problem
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+sorts
+  #numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9}.
+
+predicates
+  %% on(X, Y, N) denotes that number N is on grid position (X, Y) within the
+  %% Sudoku puzzle.
+  on(#numbers, #numbers, #numbers).
+
+  sameRegion(#numbers, #numbers, #numbers, #numbers).
+
+  sameStrip(#numbers, #numbers).
+
+  different(#numbers, #numbers, #numbers, #numbers).
+
+rules
+  %% constraint that no row can have the same number twice
+  :- on(X, Y1, N1), on(X, Y2, N2), N1 == N2, Y1 != Y2.
+
+  %% constraint that no column can have the same number twice
+  :- on(X1, Y, N1), on(X2, Y, N2), N1 == N2, X1 != X2.
+
+  %% constraint that no 3x3 box/region can have the same number twice
+   :- on(X1, Y1, N1), on(X2, Y2, N2), N1 == N2, sameRegion(X1, Y1, X2, Y2),
+        different(X1, Y1, X2, Y2).
+
+  %% sameRegion(X1, Y1, X2, Y2) denotes that (X1, X2) and (Y1, Y2) are in the
+  %% same region if (X1, X2) are in the same strip or (Y1, Y2) are in the
+  %% same strip.
+  sameRegion(X1, Y1, X2, Y2) :- sameStrip(X1, X2), sameStrip(Y1, Y2).
+
+  %% different(X1, Y1, X2, Y2) denotes that (X1, Y1) and (X2, Y2) are different
+  %% if at least one X1, Y1, X2, Y2 are differnt (one set of coordinates or the
+  %% other are different).
+  different(X1, Y1, X2, Y2) :- X1 != X2.
+  different(X1, Y1, X2, Y2) :- Y1 != Y2.
+
+  %% sameStrip(X, Y) denotes that (X, Y) are in the same strip if:
+  %% X >= 1, X <= 3 and Y >= 1, Y <= 3 or
+  %% X >= 4, X <= 6 and Y >= 4, Y <= 6 or
+  %% X >= 7 and X <= 9 and Y >= 7, Y <= 9.
+  sameStrip(X, Y) :- X >= 1, X <= 3, Y >= 1, Y <= 3.
+  sameStrip(X, Y) :- X >= 4, X <= 6, Y >= 4, Y <= 6.
+  sameStrip(X, Y) :- X >= 7, X <= 9, Y >= 7, Y <= 9.
+
+  %% Each position in the Sudoku grid must have a number assigned to it
+  %% (i.e. no position is empty).
+  on(X,Y,1) | on(X,Y,2) | on(X,Y,3) | on(X,Y,4) | on(X,Y,5) |
+  on(X,Y,6) | on(X,Y,7) | on(X,Y,8) | on(X,Y,9).
+
+  on(2, 1, 7). on(4, 1, 1). on(1, 2, 9). on(6, 2, 3).
+  on(6, 3, 7). on(8, 3, 2). on(9, 3, 5). on(2, 4, 6).
+  on(3, 5, 5). on(5, 5, 6). on(7, 5, 2). on(8, 5, 9).
+  on(1, 6, 3). on(4, 6, 4). on(5, 6, 5). on(9, 6, 6).
+  on(1, 7, 1). on(2, 7, 2). on(4, 7, 8). on(1, 8, 8).
+  on(3, 8, 9). on(7, 8, 4). on(9, 8, 7). on(1, 9, 5).
+
+display
+  on(X, Y, N).
