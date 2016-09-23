@@ -1,0 +1,302 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Author:      Justin Lugo
+%% Description: Sudoku with Drawing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% canvas constants
+#const canvasWidth = 500.
+#const canvasHeight = 500.
+#const canvasSize = 500. % equal to smaller of above dimensions
+
+%	A "frame" is an index in an array of sets of drawing
+%	commands. These drawing commands in each frame 
+%	will be executed at a 
+%	time that corresponds to (1/60) * frameNumber 
+%	since the start of the animation, and will last
+%	each for 1/60th of a second.
+% frame constant
+#const numFrames = 60.
+
+sorts
+
+  % user defined sorts
+  % list all style names you need in #stylename
+  % A style name will be associated with visual properties
+  % in later and will be used in shape drawing commands.
+  #stylename = {title, blueline, initialNumber, answerSetNumber}.
+  
+  %% Sudoku numbers for placement on puzzle grid
+  #numbers = 1..9.
+  
+  % #text contain all strings that are to be displayed
+  % using text drawing commands.
+  %   #text = {aDemonstrationOfAnimationUsingAMovingRedBoxForSPARC, 
+  %             string2, string3, 1,2,3,4,5,6,7,8,9}.
+  #text = 1..9.
+
+  % each frame is equal to 1/60th of a second
+  #frame = 0..numFrames.
+
+  % sorts required to use drawing commands
+
+	% [row] and [col] specify pixel coordinates
+	% on the canvas
+	#row = 1..canvasHeight.
+	#col = 1..canvasWidth.
+
+	% [angle] is a number that specifies an angle
+	% equal to ([ang]/8)*pi, in radians
+	#angle = 1..16.
+
+	% [radius] is a number for specifying the 
+	% radius of a circle
+	#radius = 1..canvasSize.
+
+  % sorts required to use styling commands
+
+  	% [thickness] represents the width of a line
+  	#thickness = 1..canvasSize.
+
+  	% [fontsize] represents the size of font to use
+  	#fontsize = 8..72.
+
+  	% [fontfamily] is the text font type
+  	#fontfamily = {georgia,palatino,antiqua,times,arial,helvetica,
+  	                arialBlack,impact,tahoma,verdana}.
+
+  	% [cap] is the style for a line ending
+  	#cap = {butt,round,square}.
+
+  	% [alignment] is the place alignment for text
+  	#alignment = {left,right,center,start,end}.
+
+  	% [color] is the color for any object
+  	#color = {black,navy,darkBlue,mediumBlue,blue,darkGreen,green,teal,
+  	            darkCyan,deepSkyBlue,darkTurquoise,mediumSpringGreen,lime,
+  	            springGreen,aqua,cyan,midnightBlue,dodgerBlue,lightSeaGreen,
+  	            forestGreen,seaGreen,darkSlateGray,darkSlateGrey,limeGreen,
+  	            mediumSeaGreen,turquoise,royalBlue,steelBlue,darkSlateBlue,
+  	            mediumTurquoise,indigo,darkOliveGreen,cadetBlue,cornflowerBlue,
+  	            rebeccaPurple,mediumAquaMarine,dimGray,dimGrey,slateBlue,
+  	            oliveDrab,slateGray,slateGrey,lightSlateGray,lightSlateGrey,
+  	            mediumSlateBlue,lawnGreen,chartreuse,aquamarine,maroon,purple,
+  	            olive,gray,grey,skyBlue,lightSkyBlue,blueViolet,darkRed,
+  	            darkMagenta,saddleBrown,darkSeaGreen,lightGreen,mediumPurple,
+  	            darkViolet,paleGreen,darkOrchid,yellowGreen,sienna,brown,
+  	            darkGray,darkGrey,lightBlue,greenYellow,paleTurquoise,
+  	            lightSteelBlue,powderBlue,fireBrick,darkGoldenRod,mediumOrchid,
+  	            rosyBrown,darkKhaki,silver,mediumVioletRed,indianRed,peru,
+  	            chocolate,tan,lightGray,lightGrey,thistle,orchid,goldenRod,
+  	            paleVioletRed,crimson,gainsboro,plum,burlyWood,lightCyan,
+  	            lavender,darkSalmon,violet,paleGoldenRod,lightCoral,khaki,
+  	            aliceBlue,honeyDew,azure,sandyBrown,wheat,beige,whiteSmoke,
+  	            mintCream,ghostWhite,salmon,antiqueWhite,linen,
+  	            lightGoldenRodYellow,oldLace,red,fuchsia,magenta,deepPink,
+  	            orangeRed,tomato,hotPink,coral,darkOrange,lightSalmon,orange,
+  	            lightPink,pink,gold,peachPuff,navajoWhite,moccasin,bisque,
+  	            mistyRose,blanchedAlmond,papayaWhip,lavenderBlush,seaShell,
+  	            cornsilk,lemonChiffon,floralWhite,snow,yellow,lightYellow,
+  	            ivory,white}.
+
+  % sort for connection from drawing to styling
+
+  % sorts that are the shape drawing commands
+
+  	% given two coordinate pairs, draw a line
+  	% from the first to the second with the 
+  	% styling of the object specified
+	#draw_line = draw_line(#stylename,#col,#row,#col,#row).
+
+	% given three coordinate pairs, draw a quadratic
+	% curve from the first to the third, using the
+	% second as a quadratic point and with the
+	% styling of the object specified
+	#draw_quad_curve = draw_quad_curve(#stylename,#col,#row,#col,
+	                        #row,#col,#row).
+
+	% given four coordinate pairs, draw a line from
+	% the first to the fourth, using the second and
+	% third coordinate pairs as the first and second
+	% bezier points respectively, with the styling
+	% of the object specified
+	#draw_bezier_curve = draw_bezier_curve(#stylename,#col,#row,#col,
+	                        #row,#col,#row,#col,#row).
+
+	% given a coordinate pair, a radius and two 
+	% angles, draw an arc (portion of a circle) from 
+	% the first angle specified to the second of the
+	% given radius centered at the coordinate pair
+	% with the styling of the object specified
+	#draw_arc_curve = draw_arc_curve(#stylename,#col,#row,#radius,
+	                        #angle,#angle).
+
+	% given a coordinate pair and some text, draw 
+	% the text at the coordinate point with the 
+	% styling of the object specified
+	#draw_text = draw_text(#stylename,#text,#col,#row).
+
+  % sorts that are the styling commands
+
+  	% style the specified object to have a 
+  	% specified line width
+  	#line_width = line_width(#stylename,#thickness).
+
+  	% style the given object to have a specified
+  	% font size and specified font family
+  	#text_font = text_font(#stylename,#fontsize,#fontfamily).
+
+  	% style the cap of a line ending for a
+  	% specified object 
+  	#line_cap = line_cap(#stylename,#cap).
+
+  	% style the alignment of some text for a
+  	% specified object
+  	#text_align = text_align(#stylename,#alignment).
+
+  	% style the color of a specified object
+  	#line_color = line_color(#stylename,#color).
+  	
+  	% style the color of a text 
+  	#text_color = text_color(#stylename, #color). 
+  	
+  % general drawing sort
+  	#drawing_command = #draw_line+#draw_quad_curve+
+  	                    #draw_bezier_curve+#draw_arc_curve+
+  	                    #draw_text+#line_width+#text_font+
+  	                    #line_cap+#text_align+#line_color+
+  	                    #text_color.
+
+predicates
+	
+	% drawing command applies at specified frame
+	animate(#drawing_command,#frame).
+
+	% static drawing command
+	draw(#drawing_command).
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	%% Sudoku predicate logic
+	
+	%% on(X, Y, N) denotes that number N is on grid position (X, Y) within the
+    %% Sudoku puzzle.
+    on(#numbers, #numbers, #numbers).
+    
+    %% initialValues(X, Y, N) denotes that number N is on grid position (X, Y)
+    %% within the Sudoku puzzle. These are the initial values in the Sudoku
+    %% puzzle.
+    initialValues(#numbers, #numbers, #numbers).
+  
+    %% sameRegion(X1, Y1, X2, Y2) denotes that (X1, X2) and (Y1, Y2) are in the
+    %% same region if (X1, X2) are in the same strip or (Y1, Y2) are in the
+    %% same strip.
+    sameRegion(#numbers, #numbers, #numbers, #numbers).
+  
+    %% sameStrip(X, Y) denotes that (X, Y) are in the same strip if:
+    %% X >= 1, X <= 3 and Y >= 1, Y <= 3 or
+    %% X >= 4, X <= 6 and Y >= 4, Y <= 6 or
+    %% X >= 7 and X <= 9 and Y >= 7, Y <= 9.
+    sameStrip(#numbers, #numbers).
+  
+    %% different(X1, Y1, X2, Y2) denotes that (X1, Y1) and (X2, Y2) are 
+    %% different if at least one X1, Y1, X2, Y2 are differnt (one set of 
+    %% coordinates or the other are different).
+    different(#numbers, #numbers, #numbers, #numbers).
+
+rules
+
+    %% Setup the blueline style for Sudoku puzzle lines
+    draw(line_color(blueline, blue)).
+    draw(line_width(blueline, 3)).
+    
+    %% Setup the initial number style
+    draw(text_font(initialNumber, 18, arial)).
+    draw(text_color(initialNumber, red)).
+    
+    %% Setup the answer set number style
+    draw(text_font(answerSetNumber, 18, arial)).
+    draw(text_color(answerSetNumber, green)).
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %%%%%% Sudoku logic %%%%%%
+    
+    %% constraint that no row can have the same number twice
+    :- on(X, Y1, N1), on(X, Y2, N2), N1 == N2, Y1 != Y2.
+  
+    %% constraint that no column can have the same number twice
+    :- on(X1, Y, N1), on(X2, Y, N2), N1 == N2, X1 != X2.
+
+    %% constraint that no 3x3 box/region can have the same number twice
+    :- on(X1, Y1, N1), on(X2, Y2, N2), N1 == N2, sameRegion(X1, Y1, X2, Y2), 
+            different(X1, Y1, X2, Y2).
+
+    sameRegion(X1, Y1, X2, Y2) :- sameStrip(X1, X2), sameStrip(Y1, Y2).
+
+    different(X1, Y1, X2, Y2) :- X1 != X2.
+    different(X1, Y1, X2, Y2) :- Y1 != Y2.
+  
+    sameStrip(X, Y) :- X >= 1, X <= 3, Y >= 1, Y <= 3.
+    sameStrip(X, Y) :- X >= 4, X <= 6, Y >= 4, Y <= 6.
+    sameStrip(X, Y) :- X >= 7, X <= 9, Y >= 7, Y <= 9.
+    
+    %% Each position in the Sudoku grid must have a number assigned to it
+    %% (i.e. no position is empty).
+    on(X, Y, 1) | on(X, Y, 2) | on(X, Y, 3) | on(X, Y, 4) | on(X, Y, 5) |
+    on(X, Y, 6) | on(X, Y, 7) | on(X, Y, 8) | on(X, Y, 9).
+  
+    %% Sudoku input set from the book. Need to figure out how to make this
+    %% process easier (starting grid input).
+    initialValues(2, 1, 7). initialValues(4, 1, 1). initialValues(1, 2, 9). 
+    initialValues(6, 2, 3). initialValues(6, 3, 7). initialValues(8, 3, 2). 
+    initialValues(9, 3, 5). initialValues(2, 4, 6). initialValues(3, 5, 5). 
+    initialValues(5, 5, 6). initialValues(7, 5, 2). initialValues(8, 5, 9).
+    initialValues(1, 6, 3). initialValues(4, 6, 4). initialValues(5, 6, 5).
+    initialValues(9, 6, 6). initialValues(1, 7, 1). initialValues(2, 7, 2). 
+    initialValues(4, 7, 8). initialValues(1, 8, 8). initialValues(3, 8, 9). 
+    initialValues(7, 8, 4). initialValues(9, 8, 7). initialValues(1, 9, 5).
+    
+    on(X, Y, N) :- initialValues(X, Y, N).
+    
+    %%%%%% End of Sudoku logic %%%%%%
+    
+    %%%%%% Draw the outline of the Sudoku Grid %%%%%%
+    
+    %% Top outline
+    draw(draw_line(blueline, canvasWidth/11, canvasHeight/11-10,
+                canvasHeight-50, canvasHeight/11-10)).
+    %% Left outline
+    draw(draw_line(blueline, canvasWidth/11, canvasHeight/11-10,
+                canvasWidth/11, canvasHeight-50)).
+    %% Bottom outline
+    draw(draw_line(blueline, canvasWidth/11, canvasHeight-50, canvasWidth-50,
+                    canvasHeight-50)).
+    %% Right outline
+    draw(draw_line(blueline, canvasWidth-50, canvasHeight-50, 
+                    canvasWidth-50, canvasHeight/11-10)).
+                    
+    %%%%%% End of drawing the outline %%%%%%
+                    
+    %% Draw 8 column lines
+    draw(draw_line(blueline, canvasWidth/11+X*45, canvasHeight/11-10,
+                    canvasWidth/11+X*45, canvasHeight-50)) 
+                        :- on(X, Y, N), X != 9.
+                        
+    %% Draw 8 row lines
+    draw(draw_line(blueline, canvasWidth-50, canvasHeight/11+Y*44,
+                    canvasWidth/11, canvasHeight/11+Y*44))
+                        :- on(X, Y, N), Y != 9.
+                        
+    %% Draw initial numbers on grid
+    draw(draw_text(initialNumber, N, X*canvasWidth/11+15, 
+                    Y*canvasHeight/11+22)) :- initialValues(X, Y, N).
+    
+    %% Draw the answer set numbers (numbers generated from Sudoku logic on 
+    %% the grid.
+    draw(draw_text(answerSetNumber, N, X*canvasWidth/11+15,
+            Y*canvasHeight/11+22)) :- on(X, Y, N), not initialValues(X, Y, N).
+    
+% display
+%   initialValues(X, Y, N).
+%   on(X, Y, N).
+%   answerSetValues(X, Y, N).
